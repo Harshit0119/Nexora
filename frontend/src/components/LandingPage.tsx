@@ -95,7 +95,7 @@ const LandingPage = () => {
     if (!selectedInstitute) return;
     const fetchDepartments = async () => {
       const res = await fetch(
-        `api_base/departments?institute_id=${selectedInstitute}`
+        `${API_BASE}/departments?institute_id=${selectedInstitute}`
       );
       const data = await res.json();
       setDepartments(data.map((d: any) => d.name));
@@ -157,7 +157,7 @@ const LandingPage = () => {
 
   try {
     // Register institute
-    const res = await fetch("api_base/register", {
+    const res = await fetch('${API_BASE}/register', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -173,14 +173,14 @@ const LandingPage = () => {
     if (requiresDepartments && fileInputRef.current?.files?.[0]) {
       const formDataUpload = new FormData();
       formDataUpload.append("file", fileInputRef.current.files[0]);
-      await fetch(`api_base/upload/${instituteId}`, {
+      await fetch(`${API_BASE}/upload/${instituteId}`, {
         method: "POST",
         body: formDataUpload,
       });
     }
 
     // Refresh institutes list
-    const listRes = await fetch("api_base/institutes");
+    const listRes = await fetch('${API_BASE}/institutes');
     const listData = await listRes.json();
     setInstitutes(listData);
 
