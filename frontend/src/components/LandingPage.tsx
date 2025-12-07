@@ -84,7 +84,7 @@ const LandingPage = () => {
 
    useEffect(() => {
     const fetchInstitutes = async () => {
-      const res = await fetch("api_base/institutes");
+      const res = await fetch('${API_BASE}/institutes');
       const data = await res.json();
       setInstitutes(data);
     };
