@@ -1,5 +1,16 @@
 import { useState, useRef } from "react";
-import { Building2, GraduationCap, Shield, Users, Sparkles, ArrowRight, Check, Upload, FileSpreadsheet, X } from "lucide-react";
+import {
+  Building2,
+  GraduationCap,
+  Shield,
+  Users,
+  Sparkles,
+  ArrowRight,
+  Check,
+  Upload,
+  FileSpreadsheet,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +33,7 @@ interface Institute {
   departments: string[];
 }
 
-type Role = "admin" | "teacher" | "student" | null;
+type Role = "admin" | "faculty" | "director" | null;
 
 const instituteTypes: { value: InstituteType; label: string }[] = [
   { value: "school", label: "School" },
@@ -32,16 +43,37 @@ const instituteTypes: { value: InstituteType; label: string }[] = [
 ];
 
 const roles = [
-  { id: "admin", label: "Admin", icon: Shield, description: "Full access to institute management" },
-  { id: "teacher", label: "Teacher", icon: Users, description: "Manage courses and students" },
-  { id: "student", label: "Student", icon: GraduationCap, description: "Access learning materials" },
+  {
+    id: "admin",
+    label: "Adm",
+    icon: Shield,
+    description: "Full access to institute management",
+  },
+  {
+    id: "faculty",
+    label: "faculty",
+    icon: Users,
+    description: "Manage there individual timetable",
+  },
+  {
+    id: "director",
+    label: "Director",
+    icon: GraduationCap,
+    description:
+      "Can see fauclty and all departments timeatbale and manage them",
+  },
 ];
 
 const LandingPage = () => {
   const [institutes, setInstitutes] = useState<Institute[]>([]);
   const [selectedInstitute, setSelectedInstitute] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<Role>(null);
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", type: "" as InstituteType | "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    type: "" as InstituteType | "",
+  });
   const [departments, setDepartments] = useState<string[]>([]);
   const [csvFileName, setCsvFileName] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,20 +83,23 @@ const LandingPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.csv')) {
+    if (!file.name.endsWith(".csv")) {
       toast.error("Please upload a CSV file");
       return;
     }
 
     setCsvFileName(file.name);
-    
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+      const lines = text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line);
       // Skip header if it contains "department" (case insensitive)
-      const startIndex = lines[0]?.toLowerCase().includes('department') ? 1 : 0;
-      const depts = lines.slice(startIndex).filter(dept => dept.length > 0);
+      const startIndex = lines[0]?.toLowerCase().includes("department") ? 1 : 0;
+      const depts = lines.slice(startIndex).filter((dept) => dept.length > 0);
       setDepartments(depts);
       toast.success(`${depts.length} departments loaded from CSV`);
     };
@@ -83,7 +118,12 @@ const LandingPage = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.password || !formData.type) {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.type
+    ) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -94,10 +134,10 @@ const LandingPage = () => {
     }
 
     setIsSubmitting(true);
-    
+
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 800));
-    
+
     const newInstitute: Institute = {
       id: Date.now().toString(),
       name: formData.name,
@@ -105,7 +145,7 @@ const LandingPage = () => {
       type: formData.type,
       departments: formData.type === "school" ? [] : departments,
     };
-    
+
     setInstitutes((prev) => [...prev, newInstitute]);
     setFormData({ name: "", email: "", password: "", type: "" });
     setDepartments([]);
@@ -132,16 +172,37 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+              {/* Replace SVG with your logo */}
+              <img src="icon.ico" alt="Nexora Logo" className="w-5 h-5" />
             </div>
-            <span className="text-xl font-display font-bold text-foreground">Nexora</span>
+            <span className="text-xl font-display font-bold text-foreground">
+              Nexora
+            </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-            <a href="#register" className="text-muted-foreground hover:text-foreground transition-colors">Register</a>
-            <a href="#access" className="text-muted-foreground hover:text-foreground transition-colors">Access</a>
+            <a
+              href="#features"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Features
+            </a>
+            <a
+              href="#register"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Register
+            </a>
+            <a
+              href="#access"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Access
+            </a>
           </div>
-          <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10">
+          <Button
+            variant="outline"
+            className="border-primary/50 text-primary hover:bg-primary/10"
+          >
             Sign In
           </Button>
         </div>
@@ -155,27 +216,32 @@ const LandingPage = () => {
               <Sparkles className="w-4 h-4" />
               AI-Powered Institute Management
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
               Empowering Institutes with
               <span className="block gradient-text">AI-driven Workflows</span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Nexora revolutionizes institute management with intelligent automation, 
-              role-based collaboration, and seamless workflows that adapt to your needs.
+              Nexora revolutionizes institute management with intelligent
+              automation, role-based collaboration, and seamless workflows that
+              adapt to your needs.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-semibold px-8 py-6 text-lg glow-hover transition-all duration-300"
-                onClick={() => document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document
+                    .getElementById("register")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 Get Started <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 className="border-border hover:bg-secondary/50 px-8 py-6 text-lg"
               >
@@ -187,19 +253,36 @@ const LandingPage = () => {
           {/* Features Grid */}
           <div className="grid md:grid-cols-3 gap-6 mt-20">
             {[
-              { icon: Building2, title: "Multi-Institute Support", desc: "Manage multiple institutes from a single dashboard" },
-              { icon: Shield, title: "Role-Based Access", desc: "Granular permissions for admins, teachers, and students" },
-              { icon: Sparkles, title: "AI Automation", desc: "Smart workflows that learn and adapt to your processes" },
+              {
+                icon: Building2,
+                title: "Multi-Institute Support",
+                desc: "Manage multiple institutes from a single dashboard",
+              },
+              {
+                icon: Shield,
+                title: "Role-Based Access",
+                desc: "Granular permissions for admins, facultys, and directors",
+              },
+              {
+                icon: Sparkles,
+                title: "AI Automation",
+                desc: "Smart workflows that learn and adapt to your processes",
+              },
             ].map((feature, i) => (
-              <div 
+              <div
                 key={feature.title}
                 className={`glass-card p-6 hover:border-primary/30 transition-all duration-300 glow-hover animate-slide-up opacity-0`}
-                style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: 'forwards' }}
+                style={{
+                  animationDelay: `${(i + 1) * 150}ms`,
+                  animationFillMode: "forwards",
+                }}
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-display font-semibold text-foreground mb-2">{feature.title}</h3>
+                <h3 className="text-lg font-display font-semibold text-foreground mb-2">
+                  {feature.title}
+                </h3>
                 <p className="text-muted-foreground">{feature.desc}</p>
               </div>
             ))}
@@ -212,47 +295,61 @@ const LandingPage = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
-            <div className="space-y-6 animate-slide-up opacity-0" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+            <div
+              className="space-y-6 animate-slide-up opacity-0"
+              style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
+            >
               <h2 className="text-3xl md:text-4xl font-display font-bold">
                 Register Your <span className="gradient-text">Institute</span>
               </h2>
               <p className="text-muted-foreground text-lg">
-                Join thousands of institutes already using Nexora to streamline their operations 
-                and enhance collaboration.
+                Join thousands of institutes already using Nexora to streamline
+                their operations and enhance collaboration.
               </p>
               <ul className="space-y-3">
-                {["Instant setup", "Free trial available", "24/7 support"].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-muted-foreground">
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-primary" />
-                    </div>
-                    {item}
-                  </li>
-                ))}
+                {["Instant setup", "Free trial available", "24/7 support"].map(
+                  (item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-3 text-muted-foreground"
+                    >
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-primary" />
+                      </div>
+                      {item}
+                    </li>
+                  )
+                )}
               </ul>
             </div>
 
             {/* Registration Form */}
-            <div 
+            <div
               className="glass-card p-8 glow animate-slide-up opacity-0"
-              style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}
+              style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
             >
               <form onSubmit={handleRegister} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-foreground">Institute Name</Label>
+                  <Label htmlFor="name" className="text-foreground">
+                    Institute Name
+                  </Label>
                   <Input
                     id="name"
                     placeholder="Enter institute name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="bg-secondary/50 border-border focus:border-primary focus:ring-primary/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-foreground">Institute Type</Label>
-                  <Select 
-                    value={formData.type} 
+                  <Label htmlFor="type" className="text-foreground">
+                    Institute Type
+                  </Label>
+                  <Select
+                    value={formData.type}
                     onValueChange={(val: InstituteType) => {
                       setFormData({ ...formData, type: val });
                       if (val === "school") {
@@ -275,16 +372,24 @@ const LandingPage = () => {
 
                 {requiresDepartments && (
                   <div className="space-y-2 animate-fade-in">
-                    <Label className="text-foreground">Departments (CSV Upload)</Label>
+                    <Label className="text-foreground">
+                      Departments (CSV Upload)
+                    </Label>
                     <div className="p-3 bg-secondary/50 rounded-lg border border-border mb-2">
                       <p className="text-xs text-muted-foreground mb-1">
-                        <span className="font-medium text-foreground">CSV Format:</span> Single column with header "Department"
+                        <span className="font-medium text-foreground">
+                          CSV Format:
+                        </span>{" "}
+                        Single column with header "Department"
                       </p>
                       <code className="block text-xs bg-background/50 p-2 rounded font-mono text-primary">
-                        Department<br/>
-                        Computer Science<br/>
-                        Mathematics<br/>
-                        Physics
+                        Department
+                        <br />
+                        Computer Science
+                        <br />
+                        Electrical and communication eng.
+                        <br />
+                        Mechanicl Engineering
                       </code>
                     </div>
                     <div className="relative">
@@ -302,15 +407,21 @@ const LandingPage = () => {
                           className="flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
                         >
                           <Upload className="w-6 h-6 text-muted-foreground" />
-                          <span className="text-muted-foreground">Click to upload departments CSV</span>
+                          <span className="text-muted-foreground">
+                            Click to upload departments CSV
+                          </span>
                         </label>
                       ) : (
                         <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/30 rounded-xl">
                           <div className="flex items-center gap-3">
                             <FileSpreadsheet className="w-5 h-5 text-primary" />
                             <div>
-                              <p className="text-sm font-medium text-foreground">{csvFileName}</p>
-                              <p className="text-xs text-muted-foreground">{departments.length} departments loaded</p>
+                              <p className="text-sm font-medium text-foreground">
+                                {csvFileName}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {departments.length} departments loaded
+                              </p>
                             </div>
                           </div>
                           <button
@@ -326,7 +437,10 @@ const LandingPage = () => {
                     {departments.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {departments.slice(0, 5).map((dept, i) => (
-                          <span key={i} className="px-2 py-1 text-xs bg-secondary rounded-md text-muted-foreground">
+                          <span
+                            key={i}
+                            className="px-2 py-1 text-xs bg-secondary rounded-md text-muted-foreground"
+                          >
                             {dept}
                           </span>
                         ))}
@@ -339,33 +453,41 @@ const LandingPage = () => {
                     )}
                   </div>
                 )}
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Email Address</Label>
+                  <Label htmlFor="email" className="text-foreground">
+                    Email Address
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="admin@institute.com"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="bg-secondary/50 border-border focus:border-primary focus:ring-primary/20"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground">Password</Label>
+                  <Label htmlFor="password" className="text-foreground">
+                    Password
+                  </Label>
                   <Input
                     id="password"
                     type="password"
                     placeholder="Create a secure password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     className="bg-secondary/50 border-border focus:border-primary focus:ring-primary/20"
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-semibold py-6 text-lg transition-all duration-300"
                   disabled={isSubmitting}
                 >
@@ -375,7 +497,9 @@ const LandingPage = () => {
                       Registering...
                     </span>
                   ) : (
-                    <>Register Institute <ArrowRight className="ml-2 w-5 h-5" /></>
+                    <>
+                      Register Institute <ArrowRight className="ml-2 w-5 h-5" />
+                    </>
                   )}
                 </Button>
               </form>
@@ -383,7 +507,8 @@ const LandingPage = () => {
               {institutes.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-border">
                   <p className="text-sm text-muted-foreground mb-2">
-                    {institutes.length} institute{institutes.length > 1 ? 's' : ''} registered
+                    {institutes.length} institute
+                    {institutes.length > 1 ? "s" : ""} registered
                   </p>
                 </div>
               )}
@@ -395,24 +520,30 @@ const LandingPage = () => {
       {/* Access Section */}
       <section id="access" className="py-20 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center space-y-4 mb-12 animate-slide-up opacity-0" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+          <div
+            className="text-center space-y-4 mb-12 animate-slide-up opacity-0"
+            style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
+          >
             <h2 className="text-3xl md:text-4xl font-display font-bold">
               Access Your <span className="gradient-text">Dashboard</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Select your institute and role to access the personalized dashboard
+              Select your institute and role to access the personalized
+              dashboard
             </p>
           </div>
 
-          <div 
+          <div
             className="glass-card p-8 space-y-8 animate-slide-up opacity-0"
-            style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}
+            style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
           >
             {/* Institute Selection */}
             <div className="space-y-3">
-              <Label className="text-foreground text-lg">Select Institute</Label>
-              <Select 
-                value={selectedInstitute} 
+              <Label className="text-foreground text-lg">
+                Select Institute
+              </Label>
+              <Select
+                value={selectedInstitute}
                 onValueChange={(val) => {
                   setSelectedInstitute(val);
                   setSelectedRole(null);
@@ -428,7 +559,11 @@ const LandingPage = () => {
                     </div>
                   ) : (
                     institutes.map((inst) => (
-                      <SelectItem key={inst.id} value={inst.id} className="py-3">
+                      <SelectItem
+                        key={inst.id}
+                        value={inst.id}
+                        className="py-3"
+                      >
                         <div className="flex items-center gap-3">
                           <Building2 className="w-5 h-5 text-primary" />
                           <span>{inst.name}</span>
@@ -443,7 +578,9 @@ const LandingPage = () => {
             {/* Role Selection */}
             {selectedInstitute && (
               <div className="space-y-4 animate-fade-in">
-                <Label className="text-foreground text-lg">Select Your Role</Label>
+                <Label className="text-foreground text-lg">
+                  Select Your Role
+                </Label>
                 <div className="grid md:grid-cols-3 gap-4">
                   {roles.map((role) => (
                     <button
@@ -451,17 +588,25 @@ const LandingPage = () => {
                       onClick={() => setSelectedRole(role.id as Role)}
                       className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
                         selectedRole === role.id
-                          ? 'border-primary bg-primary/10 glow'
-                          : 'border-border hover:border-primary/50 bg-secondary/30'
+                          ? "border-primary bg-primary/10 glow"
+                          : "border-border hover:border-primary/50 bg-secondary/30"
                       }`}
                     >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
-                        selectedRole === role.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                      }`}>
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
+                          selectedRole === role.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
                         <role.icon className="w-6 h-6" />
                       </div>
-                      <h4 className="font-display font-semibold text-foreground mb-1">{role.label}</h4>
-                      <p className="text-sm text-muted-foreground">{role.description}</p>
+                      <h4 className="font-display font-semibold text-foreground mb-1">
+                        {role.label}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {role.description}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -481,17 +626,17 @@ const LandingPage = () => {
                         Welcome to Nexora
                       </h3>
                       <p className="text-primary font-medium">
-                        {currentInstitute.name} — Role: {roles.find(r => r.id === selectedRole)?.label}
+                        {currentInstitute.name} — Role:{" "}
+                        {roles.find((r) => r.id === selectedRole)?.label}
                       </p>
                     </div>
                   </div>
                   <p className="text-muted-foreground">
-                    Your personalized dashboard is ready. Access courses, manage users, 
-                    and leverage AI-powered tools to enhance your institute's productivity.
+                    Your personalized dashboard is ready. Access courses, manage
+                    users, and leverage AI-powered tools to enhance your
+                    institute's productivity.
                   </p>
-                  <Button 
-                    className="mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-semibold"
-                  >
+                  <Button className="mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-semibold">
                     Enter Dashboard <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </div>
@@ -509,7 +654,9 @@ const LandingPage = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-display font-bold text-foreground">Nexora</span>
+              <span className="text-xl font-display font-bold text-foreground">
+                Nexora
+              </span>
             </div>
             <p className="text-muted-foreground text-sm">
               © 2024 Nexora. Empowering education through AI.
