@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Building2,
   GraduationCap,
@@ -32,6 +32,7 @@ interface Institute {
   type: InstituteType;
   departments: string[];
 }
+
 
 type Role = "admin" | "faculty" | "director" | null;
 
@@ -79,6 +80,27 @@ const LandingPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+   useEffect(() => {
+    const fetchInstitutes = async () => {
+      const res = await fetch("http://localhost:4000/institutes");
+      const data = await res.json();
+      setInstitutes(data);
+    };
+    fetchInstitutes();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedInstitute) return;
+    const fetchDepartments = async () => {
+      const res = await fetch(
+        `http://localhost:4000/departments?institute_id=${selectedInstitute}`
+      );
+      const data = await res.json();
+      setDepartments(data.map((d: any) => d.name));
+    };
+    fetchDepartments();
+  }, [selectedInstitute]);
+
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -117,43 +139,60 @@ const LandingPage = () => {
   const requiresDepartments = formData.type && formData.type !== "school";
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.password ||
-      !formData.type
-    ) {
-      toast.error("Please fill in all fields");
-      return;
+  e.preventDefault();
+
+  if (!formData.name || !formData.email || !formData.password || !formData.type) {
+    toast.error("Please fill in all fields");
+    return;
+  }
+
+  if (requiresDepartments && departments.length === 0) {
+    toast.error("Please upload a CSV file with departments");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    // Register institute
+    const res = await fetch("http://localhost:4000/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        type: formData.type,
+      }),
+    });
+    const { data } = await res.json();
+    const instituteId = data[0].id;
+
+    // Upload CSV if needed
+    if (requiresDepartments && fileInputRef.current?.files?.[0]) {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", fileInputRef.current.files[0]);
+      await fetch(`http://localhost:4000/upload/${instituteId}`, {
+        method: "POST",
+        body: formDataUpload,
+      });
     }
 
-    if (requiresDepartments && departments.length === 0) {
-      toast.error("Please upload a CSV file with departments");
-      return;
-    }
+    // Refresh institutes list
+    const listRes = await fetch("http://localhost:4000/institutes");
+    const listData = await listRes.json();
+    setInstitutes(listData);
 
-    setIsSubmitting(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const newInstitute: Institute = {
-      id: Date.now().toString(),
-      name: formData.name,
-      email: formData.email,
-      type: formData.type,
-      departments: formData.type === "school" ? [] : departments,
-    };
-
-    setInstitutes((prev) => [...prev, newInstitute]);
+    toast.success(`${formData.name} registered successfully!`);
+  } catch (err) {
+    toast.error("Error registering institute");
+  } finally {
+    setIsSubmitting(false);
     setFormData({ name: "", email: "", password: "", type: "" });
     setDepartments([]);
     setCsvFileName("");
     if (fileInputRef.current) fileInputRef.current.value = "";
-    setIsSubmitting(false);
-    toast.success(`${newInstitute.name} registered successfully!`);
-  };
+  }
+};
 
   const currentInstitute = institutes.find((i) => i.id === selectedInstitute);
 
