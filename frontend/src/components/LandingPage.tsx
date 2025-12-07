@@ -65,6 +65,8 @@ const roles = [
   },
 ];
 
+const API_BASE = "https://nexora-6qdg.onrender.com";
+
 const LandingPage = () => {
   const [institutes, setInstitutes] = useState<Institute[]>([]);
   const [selectedInstitute, setSelectedInstitute] = useState<string>("");
@@ -82,7 +84,7 @@ const LandingPage = () => {
 
    useEffect(() => {
     const fetchInstitutes = async () => {
-      const res = await fetch("http://localhost:4000/institutes");
+      const res = await fetch("api_base/institutes");
       const data = await res.json();
       setInstitutes(data);
     };
@@ -93,7 +95,7 @@ const LandingPage = () => {
     if (!selectedInstitute) return;
     const fetchDepartments = async () => {
       const res = await fetch(
-        `http://localhost:4000/departments?institute_id=${selectedInstitute}`
+        `api_base/departments?institute_id=${selectedInstitute}`
       );
       const data = await res.json();
       setDepartments(data.map((d: any) => d.name));
@@ -155,7 +157,7 @@ const LandingPage = () => {
 
   try {
     // Register institute
-    const res = await fetch("http://localhost:4000/register", {
+    const res = await fetch("api_base/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -171,14 +173,14 @@ const LandingPage = () => {
     if (requiresDepartments && fileInputRef.current?.files?.[0]) {
       const formDataUpload = new FormData();
       formDataUpload.append("file", fileInputRef.current.files[0]);
-      await fetch(`http://localhost:4000/upload/${instituteId}`, {
+      await fetch(`api_base/upload/${instituteId}`, {
         method: "POST",
         body: formDataUpload,
       });
     }
 
     // Refresh institutes list
-    const listRes = await fetch("http://localhost:4000/institutes");
+    const listRes = await fetch("api_base/institutes");
     const listData = await listRes.json();
     setInstitutes(listData);
 
