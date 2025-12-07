@@ -45,7 +45,7 @@ const instituteTypes: { value: InstituteType; label: string }[] = [
 const roles = [
   {
     id: "admin",
-    label: "Adm",
+    label: "Admin",
     icon: Shield,
     description: "Full access to institute management",
   },
