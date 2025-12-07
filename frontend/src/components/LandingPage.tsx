@@ -84,7 +84,7 @@ const LandingPage = () => {
 
    useEffect(() => {
     const fetchInstitutes = async () => {
-      const res = await fetch('${API_BASE}/institutes');
+      const res = await fetch(`${API_BASE}/institutes`);
       const data = await res.json();
       setInstitutes(data);
     };
@@ -157,7 +157,7 @@ const LandingPage = () => {
 
   try {
     // Register institute
-    const res = await fetch('${API_BASE}/register', {
+    const res = await fetch(`${API_BASE}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -180,7 +180,7 @@ const LandingPage = () => {
     }
 
     // Refresh institutes list
-    const listRes = await fetch('${API_BASE}/institutes');
+    const listRes = await fetch(`${API_BASE}/institutes`);
     const listData = await listRes.json();
     setInstitutes(listData);
 
