@@ -789,9 +789,10 @@ const LandingPage = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
-              </div>
+               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              {/* Replace SVG with your logo */}
+              <img src="icon.ico" alt="Nexora Logo" className="w-40 h-25" />
+            </div>
               <span className="text-xl font-display font-bold text-foreground">
                 Nexora
               </span>
