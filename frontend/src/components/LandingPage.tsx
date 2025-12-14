@@ -222,9 +222,9 @@ const LandingPage = () => {
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl from-primary to-accent flex items-center justify-center">
               {/* Replace SVG with your logo */}
-              <img src="icon.ico" alt="Nexora Logo" className="w-40 h-25" />
+              <img src="icon.ico" alt="Nexora Logo" className="w-50 h-25" />
             </div>
-            <span className="text-xl font-display font-bold text-foreground">
+            <span className="text-xl font-display font-bold text-yellow-400">
               Nexora
             </span>
           </div>
@@ -791,7 +791,7 @@ const LandingPage = () => {
             <div className="flex items-center gap-2">
                <div className="w-10 h-10 rounded-xl from-primary to-accent flex items-center justify-center">
               {/* Replace SVG with your logo */}
-              <img src="icon.ico" alt="Nexora Logo" className="w-40 h-25" />
+              <img src="icon.ico" alt="Nexora Logo" className="w-50 h-25" />
             </div>
               <span className="text-xl font-display font-bold text-yellow-400">
                 Nexora
