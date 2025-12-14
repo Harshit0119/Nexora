@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import {
   Building2,
-  GraduationCap,
+  Briefcase,
   Shield,
   Users,
   Sparkles,
@@ -59,7 +59,7 @@ const roles = [
   {
     id: "director",
     label: "Director",
-    icon: GraduationCap,
+    icon: Briefcase,
     description:
       "Can see fauclty and all departments timeatbale and manage them",
   },
