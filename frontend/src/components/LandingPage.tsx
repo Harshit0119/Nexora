@@ -220,7 +220,7 @@ const LandingPage = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-11 h-10 rounded-xl from-primary to-accent flex items-center justify-center">
+            <div className="w-12 h-10 rounded-xl from-primary to-accent flex items-center justify-center">
               {/* Replace SVG with your logo */}
               <img src="icon.ico" alt="Nexora Logo" className="w-50 h-25" />
             </div>
