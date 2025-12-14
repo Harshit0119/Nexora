@@ -33,7 +33,6 @@ interface Institute {
   departments: string[];
 }
 
-
 type Role = "admin" | "faculty" | "director" | null;
 
 const instituteTypes: { value: InstituteType; label: string }[] = [
@@ -52,9 +51,10 @@ const roles = [
   },
   {
     id: "faculty",
-    label: "faculty",
+    label: "Faculty",
     icon: Users,
-    description: "Manage there individual timetable",
+    description:
+      "Manage there individual timetable and can arrange there lectures",
   },
   {
     id: "director",
@@ -82,7 +82,7 @@ const LandingPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchInstitutes = async () => {
       const res = await fetch(`${API_BASE}/institutes`);
       const data = await res.json();
@@ -138,63 +138,71 @@ const LandingPage = () => {
     }
   };
 
+  // login admin
+  const [authMode, setAuthMode] = useState<"none" | "login" | "signup">("none");
+
   const requiresDepartments = formData.type && formData.type !== "school";
 
   const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.name || !formData.email || !formData.password || !formData.type) {
-    toast.error("Please fill in all fields");
-    return;
-  }
-
-  if (requiresDepartments && departments.length === 0) {
-    toast.error("Please upload a CSV file with departments");
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    // Register institute
-    const res = await fetch(`${API_BASE}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        type: formData.type,
-      }),
-    });
-    const { data } = await res.json();
-    const instituteId = data[0].id;
-
-    // Upload CSV if needed
-    if (requiresDepartments && fileInputRef.current?.files?.[0]) {
-      const formDataUpload = new FormData();
-      formDataUpload.append("file", fileInputRef.current.files[0]);
-      await fetch(`${API_BASE}/upload/${instituteId}`, {
-        method: "POST",
-        body: formDataUpload,
-      });
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.type
+    ) {
+      toast.error("Please fill in all fields");
+      return;
     }
 
-    // Refresh institutes list
-    const listRes = await fetch(`${API_BASE}/institutes`);
-    const listData = await listRes.json();
-    setInstitutes(listData);
+    if (requiresDepartments && departments.length === 0) {
+      toast.error("Please upload a CSV file with departments");
+      return;
+    }
 
-    toast.success(`${formData.name} registered successfully!`);
-  } catch (err) {
-    toast.error("Error registering institute");
-  } finally {
-    setIsSubmitting(false);
-    setFormData({ name: "", email: "", password: "", type: "" });
-    setDepartments([]);
-    setCsvFileName("");
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }
-};
+    setIsSubmitting(true);
+
+    try {
+      // Register institute
+      const res = await fetch(`${API_BASE}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          type: formData.type,
+        }),
+      });
+      const { data } = await res.json();
+      const instituteId = data[0].id;
+
+      // Upload CSV if needed
+      if (requiresDepartments && fileInputRef.current?.files?.[0]) {
+        const formDataUpload = new FormData();
+        formDataUpload.append("file", fileInputRef.current.files[0]);
+        await fetch(`${API_BASE}/upload/${instituteId}`, {
+          method: "POST",
+          body: formDataUpload,
+        });
+      }
+
+      // Refresh institutes list
+      const listRes = await fetch(`${API_BASE}/institutes`);
+      const listData = await listRes.json();
+      setInstitutes(listData);
+
+      toast.success(`${formData.name} registered successfully!`);
+    } catch (err) {
+      toast.error("Error registering institute");
+    } finally {
+      setIsSubmitting(false);
+      setFormData({ name: "", email: "", password: "", type: "" });
+      setDepartments([]);
+      setCsvFileName("");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const currentInstitute = institutes.find((i) => i.id === selectedInstitute);
 
@@ -626,7 +634,10 @@ const LandingPage = () => {
                   {roles.map((role) => (
                     <button
                       key={role.id}
-                      onClick={() => setSelectedRole(role.id as Role)}
+                      onClick={() => {
+                        setSelectedRole(role.id as Role);
+                        setAuthMode("none"); // reset auth mode
+                      }}
                       className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
                         selectedRole === role.id
                           ? "border-primary bg-primary/10 glow"
@@ -654,8 +665,94 @@ const LandingPage = () => {
               </div>
             )}
 
+            {/* Auth Options */}
+            {selectedRole && authMode === "none" && (
+              <div className="animate-fade-in mt-6 space-y-4">
+                <h3 className="text-xl font-display font-semibold text-foreground">
+                  {roles.find((r) => r.id === selectedRole)?.label} Access
+                </h3>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    className="bg-primary text-primary-foreground hover:opacity-90"
+                    onClick={() => setAuthMode("login")}
+                  >
+                    Login
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="border-primary text-primary hover:bg-primary/10"
+                    onClick={() => setAuthMode("signup")}
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Login Form */}
+            {authMode === "login" && (
+              <div className="animate-fade-in mt-6 p-6 rounded-xl border bg-secondary/30 space-y-4">
+                <h3 className="text-xl font-display font-semibold text-foreground">
+                  Login as {roles.find((r) => r.id === selectedRole)?.label}
+                </h3>
+
+                <div className="space-y-3">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Enter your email" />
+
+                  <Label>Password</Label>
+                  <Input type="password" placeholder="Enter your password" />
+                </div>
+
+                <Button className="w-full bg-primary text-primary-foreground hover:opacity-90 mt-4">
+                  Login
+                </Button>
+
+                <p
+                  className="text-sm text-primary cursor-pointer mt-2"
+                  onClick={() => setAuthMode("signup")}
+                >
+                  New here? Create an account
+                </p>
+              </div>
+            )}
+
+            {/* Signup Form */}
+            {authMode === "signup" && (
+              <div className="animate-fade-in mt-6 p-6 rounded-xl border bg-secondary/30 space-y-4">
+                <h3 className="text-xl font-display font-semibold text-foreground">
+                  Create Admin Account
+                </h3>
+
+                <div className="space-y-3">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="Enter your email" />
+
+                  <Label>Create Password</Label>
+                  <Input type="password" placeholder="Create password" />
+
+                  <Label>Confirm Password</Label>
+                  <Input type="password" placeholder="Confirm password" />
+                </div>
+
+                <Button className="w-full bg-primary text-primary-foreground hover:opacity-90 mt-4">
+                  Sign Up
+                </Button>
+
+                <p
+                  className="text-sm text-primary cursor-pointer mt-2"
+                  onClick={() => setAuthMode("login")}
+                >
+                  Already have an account? Login
+                </p>
+              </div>
+            )}
+
             {/* Dashboard Preview */}
-            {selectedInstitute && selectedRole && currentInstitute && (
+
+            {/* {selectedInstitute && selectedRole && currentInstitute && (
               <div className="animate-fade-in">
                 <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-2xl p-8 border border-primary/20 glow">
                   <div className="flex items-center gap-4 mb-4">
@@ -682,7 +779,7 @@ const LandingPage = () => {
                   </Button>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </section>
